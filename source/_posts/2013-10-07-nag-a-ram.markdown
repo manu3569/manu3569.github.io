@@ -1,0 +1,40 @@
+---
+layout: post
+title: "Nag A Ram"
+date: 2013-10-07 12:05
+comments: true
+categories: Ruby
+---
+
+> An anagram is a type of word play, the result of rearranging the letters of a word or phrase to produce a new word or phrase, using all the original letters exactly once; for example orchestra can be rearranged into carthorse. Someone who creates anagrams may be called an "anagrammatist". *Source: [Wikipedia](http://en.wikipedia.org/wiki/Anagram)*
+
+<br/>
+
+The core of a recent code challange included finding out whether one string is an anagram of another. Now this task can be accomplished with a couple of iterators and character comparison, but such an answer would yield code that is too complex looking for what I needs to accomplish and it may be difficult to read.
+
+Rather than picking each letter from the first string and finding it in the second, I wanted to compare the two strings in a single step. First, the strings both need to be sorted and in order to do this, they first had to be converted to an array of single letters. With a little `String#split` and `Array#sort` magic the resulting arrays can easily be compared.
+
+<br/>
+
+``` ruby
+class Anagram
+
+  def initialize(word)
+    @word = word
+    @word_match_string = generate_match_string(word)
+  end
+
+  def match(words)
+    words.select do |potential_anagram|
+      @word_match_string == generate_match_string(potential_anagram)
+    end
+  end
+
+  private 
+
+  def generate_match_string(word)
+    word.downcase.split("").sort
+  end
+
+end
+```
