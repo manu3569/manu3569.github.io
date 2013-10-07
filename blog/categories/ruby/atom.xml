@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ruby | Lucid Coding]]></title>
+  <link href="http://manu3569.github.io/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://manu3569.github.io/"/>
+  <updated>2013-10-07T14:00:59-04:00</updated>
+  <id>http://manu3569.github.io/</id>
+  <author>
+    <name><![CDATA[Manuel Neuhauser]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Nag A Ram]]></title>
+    <link href="http://manu3569.github.io/blog/2013/10/07/nag-a-ram/"/>
+    <updated>2013-10-07T12:05:00-04:00</updated>
+    <id>http://manu3569.github.io/blog/2013/10/07/nag-a-ram</id>
+    <content type="html"><![CDATA[<blockquote><p>An anagram is a type of word play, the result of rearranging the letters of a word or phrase to produce a new word or phrase, using all the original letters exactly once; for example orchestra can be rearranged into carthorse. Someone who creates anagrams may be called an &ldquo;anagrammatist&rdquo;. <em>Source: <a href="http://en.wikipedia.org/wiki/Anagram">Wikipedia</a></em></p></blockquote>
+
+<br/>
+
+
+<p>The core of a recent code challange included finding out whether one string is an anagram of another. Now this task can be accomplished with a couple of iterators and character comparison, but such an answer would yield code that is too complex looking for what I needs to accomplish and it may be difficult to read.</p>
+
+<p>Rather than picking each letter from the first string and finding it in the second, I wanted to compare the two strings in a single step. First, the strings both need to be sorted and in order to do this, they first had to be converted to an array of single letters. With a little <code>String#split</code> and <code>Array#sort</code> magic the resulting arrays can easily be compared.</p>
+
+<br/>
+
+
+<p>``` ruby
+class Anagram</p>
+
+<p>  def initialize(word)</p>
+
+<pre><code>@word = word
+@word_match_string = generate_match_string(word)
+</code></pre>
+
+<p>  end</p>
+
+<p>  def match(words)</p>
+
+<pre><code>words.select do |potential_anagram|
+  @word_match_string == generate_match_string(potential_anagram)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  def generate_match_string(word)</p>
+
+<pre><code>word.downcase.split("").sort
+</code></pre>
+
+<p>  end</p>
+
+<p>end
+```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[hello world]]></title>
+    <link href="http://manu3569.github.io/blog/2013/09/24/hello-world/"/>
+    <updated>2013-09-24T16:56:00-04:00</updated>
+    <id>http://manu3569.github.io/blog/2013/09/24/hello-world</id>
+    <content type="html"><![CDATA[<p>This is my first post!</p>
+]]></content>
+  </entry>
+  
+</feed>
