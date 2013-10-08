@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Lucid Coding]]></title>
   <link href="http://manu3569.github.io/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-10-08T09:38:00-04:00</updated>
+  <updated>2013-10-08T11:32:49-04:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
@@ -49,6 +49,42 @@ fruit = %w(apple orange banana apple kiwi grapes apple)</p>
 fruit = %w(apple orange banana apple kiwi grapes apple)
 fruit.count { |item| %w(banana kiwi).include? item } #=&gt; 2
 </code></p>
+
+<br/>
+
+
+<h2>#lazy</h2>
+
+<p>We all like to be lazy sometimes. Starting in Ruby 2.0, we can now let <code>Enumerable</code> objects be lazy too. All this means is that the result of the enumerable function will not get evaluated until you tell it to.</p>
+
+<p>``` ruby
+car_names = %w(audi chevrolet dodge)</p>
+
+<p>capitalized_car_names = car_names.lazy.map &amp;:capitalize
+ => #&lt;Enumerator::Lazy: #&lt;Enumerator::Lazy: [&ldquo;audi&rdquo;, &ldquo;chevrolet&rdquo;, &ldquo;dodge&rdquo;]>:map></p>
+
+<p>capitalized_car_names.to_a
+ => [&ldquo;Audi&rdquo;, &ldquo;Chevrolet&rdquo;, &ldquo;Dodge&rdquo;]
+```</p>
+
+<p>The behavior in this example doesn&rsquo;t really show the full potential of <code>#lazy</code>. Imagine that you have an operation that you want to apply to a collection, however, the contents of the given collection are dynamically changing. Using <code>#lazy</code> keeps the enumerator updated with the latest state of the collection.</p>
+
+<p>``` ruby</p>
+
+<p>car_names &lt;&lt; &lsquo;volkswagen&rsquo;</p>
+
+<p>capitalized_car_names
+ => #&lt;Enumerator::Lazy: #&lt;Enumerator::Lazy: [&ldquo;audi&rdquo;, &ldquo;chevrolet&rdquo;, &ldquo;dodge&rdquo;, &ldquo;volkswagen&rdquo;]>:map></p>
+
+<p>capitalized_car_names.to_a
+ => [&ldquo;Audi&rdquo;, &ldquo;Chevrolet&rdquo;, &ldquo;Dodge&rdquo;, &ldquo;Volkswagen&rdquo;]</p>
+
+<p>car_names.shift
+ => &ldquo;audi&rdquo;</p>
+
+<p>capitalized_car_names.to_a
+ => [&ldquo;Chevrolet&rdquo;, &ldquo;Dodge&rdquo;, &ldquo;Volkswagen&rdquo;]
+```</p>
 ]]></content>
   </entry>
   

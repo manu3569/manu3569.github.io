@@ -4,7 +4,7 @@
   <title><![CDATA[Lucid Coding]]></title>
   <link href="http://manu3569.github.io/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-10-08T09:38:00-04:00</updated>
+  <updated>2013-10-08T11:32:49-04:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
@@ -52,6 +52,63 @@
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">fruit</span> <span class="o">=</span> <span class="sx">%w(apple orange banana apple kiwi grapes apple)</span>
 </span><span class='line'><span class="n">fruit</span><span class="o">.</span><span class="n">count</span> <span class="p">{</span> <span class="o">|</span><span class="n">item</span><span class="o">|</span> <span class="sx">%w(banana kiwi)</span><span class="o">.</span><span class="n">include?</span> <span class="n">item</span> <span class="p">}</span> <span class="c1">#=&gt; 2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<h2>#lazy</h2>
+
+<p>We all like to be lazy sometimes. Starting in Ruby 2.0, we can now let <code>Enumerable</code> objects be lazy too. All this means is that the result of the enumerable function will not get evaluated until you tell it to.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">car_names</span> <span class="o">=</span> <span class="sx">%w(audi chevrolet dodge)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span> <span class="o">=</span> <span class="n">car_names</span><span class="o">.</span><span class="n">lazy</span><span class="o">.</span><span class="n">map</span> <span class="o">&amp;</span><span class="ss">:capitalize</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Enumerator::Lazy: #&lt;Enumerator::Lazy: [&quot;audi&quot;, &quot;chevrolet&quot;, &quot;dodge&quot;]&gt;:map&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span><span class="o">.</span><span class="n">to_a</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Audi&quot;</span><span class="p">,</span> <span class="s2">&quot;Chevrolet&quot;</span><span class="p">,</span> <span class="s2">&quot;Dodge&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The behavior in this example doesn&rsquo;t really show the full potential of <code>#lazy</code>. Imagine that you have an operation that you want to apply to a collection, however, the contents of the given collection are dynamically changing. Using <code>#lazy</code> keeps the enumerator updated with the latest state of the collection.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">car_names</span> <span class="o">&lt;&lt;</span> <span class="s1">&#39;volkswagen&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Enumerator::Lazy: #&lt;Enumerator::Lazy: [&quot;audi&quot;, &quot;chevrolet&quot;, &quot;dodge&quot;, &quot;volkswagen&quot;]&gt;:map&gt; </span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span><span class="o">.</span><span class="n">to_a</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Audi&quot;</span><span class="p">,</span> <span class="s2">&quot;Chevrolet&quot;</span><span class="p">,</span> <span class="s2">&quot;Dodge&quot;</span><span class="p">,</span> <span class="s2">&quot;Volkswagen&quot;</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">car_names</span><span class="o">.</span><span class="n">shift</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;audi&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span><span class="o">.</span><span class="n">to_a</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Chevrolet&quot;</span><span class="p">,</span> <span class="s2">&quot;Dodge&quot;</span><span class="p">,</span> <span class="s2">&quot;Volkswagen&quot;</span><span class="o">]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
