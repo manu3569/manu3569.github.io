@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Lucid Coding]]></title>
   <link href="http://manu3569.github.io/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-10-07T14:00:59-04:00</updated>
+  <updated>2013-10-08T09:38:00-04:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
@@ -12,6 +12,45 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Enumerable's Best Kept Secrets]]></title>
+    <link href="http://manu3569.github.io/blog/2013/10/07/enumerables-best-kept-secrets/"/>
+    <updated>2013-10-07T18:41:00-04:00</updated>
+    <id>http://manu3569.github.io/blog/2013/10/07/enumerables-best-kept-secrets</id>
+    <content type="html"><![CDATA[<blockquote><p>An <code>Enumerator</code> is defined as a &ldquo;class which allows both internal and external iteration.&rdquo; It represent a series of objects, it can be lazily generated and it can be infinite. In contrast, the an <code>Enumerable</code> is a module and it &ldquo;provides collection classes with several traversal and searching methods, and with the ability to sort.&rdquo;</p></blockquote>
+
+<br/>
+
+
+<p>In Ruby, enumerators are used quite frequently for their extensive abstraction of iteration functionality. When we call the <code>Array#each</code> method, we can focus on dealing with the individual <code>Array</code> items rather than having to worry about how to retrieve each item one by one. When we need to find a subset of items from a <code>Hash</code>, we can use <code>#select</code> with a code block to decide which item we want in the result, without necessarily knowing how the <code>Hash</code> is traversed.</p>
+
+<br/>
+
+
+<p>All this power comes from the <code>Enumerable</code> module, and it is inlucded by many of the common Object types such as <code>Array</code>, <code>Hash</code>, <code>Range</code>, and <code>Set</code>. When first learning Ruby, <code>#each</code> and <code>#collect</code> quickly become an often-used tool we use for iterating over data. Most functionality can be accomplished by their use, however, there are many more advanced iterators available with very specific funtionality, but unless we constantly skim over the Ruby documentation, we may not know about them. I&rsquo;d like to introduce (or re-introduce for some of you) some of my favorites.</p>
+
+<br/>
+
+
+<h2>#count</h2>
+
+<p>Alright, alright. You may use <code>#count</code> on a daily basis, but did you know that you can specify a parameter to the method call? It will return the number of occurrances of that particular value.</p>
+
+<p>``` ruby
+fruit = %w(apple orange banana apple kiwi grapes apple)</p>
+
+<p>fruit.count(&ldquo;apple&rdquo;) #=> 3
+```</p>
+
+<p>If you though that was cool, then hold on to your pants. When you add a block that evaluates a condition for each item in the collection, you can add logic regarding which items you want to count. If the block return <code>true</code> the item gets counted.</p>
+
+<p><code>ruby
+fruit = %w(apple orange banana apple kiwi grapes apple)
+fruit.count { |item| %w(banana kiwi).include? item } #=&gt; 2
+</code></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Nag A Ram]]></title>
