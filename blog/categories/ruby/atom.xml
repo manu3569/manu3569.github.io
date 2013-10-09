@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Lucid Coding]]></title>
   <link href="http://manu3569.github.io/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-10-08T23:44:21-04:00</updated>
+  <updated>2013-10-08T23:45:59-04:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
@@ -18,7 +18,7 @@
     <link href="http://manu3569.github.io/blog/2013/10/08/whats-splat/"/>
     <updated>2013-10-08T22:12:00-04:00</updated>
     <id>http://manu3569.github.io/blog/2013/10/08/whats-splat</id>
-    <content type="html"><![CDATA[<p>The asterisk operator commonly known as splat can be a powerful ally in writing clean and highly functional code.  The splat operator has a variety of behavior depending on where it is used, and in this post I&rsquo;ll focus on the use of splat in conjunction with methods in Ruby 1.9 and later.</p>
+    <content type="html"><![CDATA[<p>The asterisk operator commonly known as splat can be a powerful ally in writing clean and highly functional code.  The splat operator has a variety of behaviors depending on where it is used, and in this post I&rsquo;ll focus on the use of splat in conjunction with methods in Ruby 1.9 and later.</p>
 
 <br/>
 
