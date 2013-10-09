@@ -4,7 +4,7 @@
   <title><![CDATA[Lucid Coding]]></title>
   <link href="http://manu3569.github.io/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-10-08T11:32:49-04:00</updated>
+  <updated>2013-10-08T23:44:21-04:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
@@ -12,6 +12,234 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[What's Splat?]]></title>
+    <link href="http://manu3569.github.io/blog/2013/10/08/whats-splat/"/>
+    <updated>2013-10-08T22:12:00-04:00</updated>
+    <id>http://manu3569.github.io/blog/2013/10/08/whats-splat</id>
+    <content type="html"><![CDATA[<p>The asterisk operator commonly known as splat can be a powerful ally in writing clean and highly functional code.  The splat operator has a variety of behavior depending on where it is used, and in this post I&rsquo;ll focus on the use of splat in conjunction with methods in Ruby 1.9 and later.</p>
+
+<br/>
+
+
+<h3>Arbitrary Argument Length in Method Signature</h3>
+
+<p>Occasionally, we would like to define a method that will accept an undefined number of argument.  Typically, we use an optional <code>Hash</code> as the last argument, which holds a variety of arguments.  However, we can also take advantage of the splat operator by placing it in front of an argument variable name in the method definition.  It will cause the argument variable to capture an <code>Array</code> of all arguments passed to the function that have not been matched to other arguments in the method signature.  The splat operator can be used at the beginning or at the end of the argument list, though for the latter, the last argument that is passed into the function must be a <code>Hash</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">add_to</span><span class="p">(</span><span class="n">playlist</span><span class="p">,</span> <span class="o">*</span><span class="n">songs</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">songs</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">song</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">playlist</span> <span class="o">&lt;&lt;</span> <span class="n">song</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">rock</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'><span class="n">add_to</span><span class="p">(</span><span class="n">rock</span><span class="p">,</span> <span class="s2">&quot;Beatles - Yellow Submarine&quot;</span><span class="p">,</span> <span class="s2">&quot;Counting Crows - Big Yellow Taxi&quot;</span><span class="p">,</span> <span class="s2">&quot;Coldplay - Yellow&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">rock</span><span class="o">.</span><span class="n">inspect</span>
+</span><span class='line'> <span class="c1">#=&gt; &quot;[&quot;Beatles - Yellow Submarine&quot;, &quot;Counting Crows - Big Yellow Taxi&quot;, &quot;Coldplay - Yellow&quot;]&quot; </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">display_songs</span><span class="p">(</span><span class="o">*</span><span class="n">songs</span><span class="p">,</span> <span class="n">formatting</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">songs</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">song</span><span class="o">|</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">formatting</span><span class="o">[</span><span class="ss">:start</span><span class="o">]</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">song</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">formatting</span><span class="o">[</span><span class="ss">:end</span><span class="o">]</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">display_songs</span><span class="p">(</span><span class="s2">&quot;Stairway to Heaven&quot;</span><span class="p">,</span> <span class="s2">&quot;Hotel California&quot;</span><span class="p">,</span> <span class="s2">&quot;Hold the Line&quot;</span><span class="p">,</span> <span class="p">{</span><span class="ss">:start</span> <span class="o">=&gt;</span> <span class="s2">&quot;&gt;&gt;&gt;&quot;</span><span class="p">,</span> <span class="ss">:end</span> <span class="o">=&gt;</span> <span class="s2">&quot;&lt;&lt;&lt;&quot;</span><span class="p">})</span>
+</span><span class='line'> <span class="c1"># &gt;&gt;&gt; Stairway to Heaven &lt;&lt;&lt;</span>
+</span><span class='line'> <span class="c1"># &gt;&gt;&gt; Hotel California &lt;&lt;&lt;</span>
+</span><span class='line'> <span class="c1"># &gt;&gt;&gt; Hold the Line &lt;&lt;&lt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There is one more &mdash;for the lack of a better word&mdash; <em>interesting</em> use of the splat operator in the method signature at the end when it&rsquo;s by itself.  It allows for additional arguments to be accepted, but ignored by the method.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">my_favorite_food</span><span class="p">(</span><span class="n">first</span><span class="p">,</span><span class="n">second</span><span class="p">,</span><span class="o">*</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;My favorite food items are </span><span class="si">#{</span><span class="n">first</span><span class="si">}</span><span class="s2"> and </span><span class="si">#{</span><span class="n">second</span><span class="si">}</span><span class="s2">.&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">my_favorite_food</span><span class="p">(</span><span class="s2">&quot;pizza&quot;</span><span class="p">,</span><span class="s2">&quot;sushi&quot;</span><span class="p">,</span><span class="s2">&quot;salad&quot;</span><span class="p">)</span>
+</span><span class='line'> <span class="c1">#=&gt; My favorite food items are pizza and sushi.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>Calling Methods</h3>
+
+<p>The reason for this blog entry is actually this section.  I recently worked on a project in which I wanted to use <code>Object#send</code> to dynamically call an instance method. The method <code>#play</code> takes an argument, while <code>#list</code> doesn&rsquo;t. I quickly ran into a problem with this particular code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">play</span><span class="p">(</span><span class="n">song</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1"># code to play given song</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">list</span>
+</span><span class='line'>  <span class="c1"># code to display all songs</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">command</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">input</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">args</span><span class="o">.</span><span class="n">inspect</span>
+</span><span class='line'>  <span class="nb">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">process</span><span class="p">(</span><span class="s2">&quot;play Michael Jackson - Beat It&quot;</span><span class="p">)</span>
+</span><span class='line'> <span class="c1">#=&gt; nil </span>
+</span><span class='line'>
+</span><span class='line'><span class="n">process</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">)</span>
+</span><span class='line'> <span class="c1">#ArgumentError: wrong number of arguments (1 for 0)</span>
+</span><span class='line'> <span class="c1"># from (irb):32:in `list&#39;</span>
+</span><span class='line'> <span class="c1"># from (irb):38:in `process&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When processing the input &ldquo;list&rdquo;, <code>args</code> is set to <code>nil</code>, which is still considered an argument and it triggers an <code>ArgumentError</code> because <code>#list</code> does not take any arguments.</p>
+
+<p>Our little friend splat can actually help us resolve this issue.  When calling a method and prepending the splat to an array variable, it will cause it to be distributed across the arguments of the method.  In my case, the empty <code>args</code> variable was distributed across exactly no arguments.  By adding the splat, we can now dynamically send either one or two arguments to the <code>#send</code> function.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">command</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">input</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">args</span><span class="o">.</span><span class="n">class</span>
+</span><span class='line'>  <span class="nb">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">process</span><span class="p">(</span><span class="s2">&quot;play Michael Jackson - Beat It&quot;</span><span class="p">)</span>
+</span><span class='line'> <span class="c1">#=&gt; nil </span>
+</span><span class='line'>
+</span><span class='line'><span class="n">process</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">)</span>
+</span><span class='line'> <span class="c1">#=&gt; nil</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When using splat to distribute the values to the arguments, the count must match exactly.  Also, only a splat in front of an empty <code>Array</code>, <code>Hash</code> or <code>nil</code> will yield no value to argument assignment.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">zero</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Nothing&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">one</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">two</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">a</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="n">b</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">three</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">a</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="n">b</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="n">c</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">values</span> <span class="o">=</span> <span class="o">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zero</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span>  <span class="c1"># Error</span>
+</span><span class='line'><span class="n">one</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span>   <span class="c1"># Error</span>
+</span><span class='line'><span class="n">two</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span>   <span class="c1"># Success</span>
+</span><span class='line'><span class="n">three</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span> <span class="c1"># Error</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zero</span><span class="p">(</span><span class="o">*[]</span><span class="p">)</span>      <span class="c1"># Success</span>
+</span><span class='line'><span class="n">zero</span><span class="p">(</span><span class="o">*</span><span class="p">{})</span>      <span class="c1"># Success</span>
+</span><span class='line'><span class="n">zero</span><span class="p">(</span><span class="o">*</span><span class="kp">nil</span><span class="p">)</span>     <span class="c1"># Success</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Enumerable's Best Kept Secrets]]></title>

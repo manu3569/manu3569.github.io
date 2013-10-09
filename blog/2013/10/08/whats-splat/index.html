@@ -3,11 +3,11 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Lucid Coding</title>
+	<title>What's Splat? - Lucid Coding</title>
 	<meta name="author" content="Manuel Neuhauser">
 
 	
-	<meta name="description" content="The asterisk operator commonly known as splat can be a powerful ally in writing clean and highly functional code. The splat operator has a variety &hellip;">
+	<meta name="description" content="The asterisk operator commonly known as splat can be a powerful ally in writing clean and highly functional code. The splat operator has a variety of &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -75,18 +75,9 @@
 	
 		
 	
-	<div id="content" class="inner">
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2013/10/08/whats-splat/">
-		
-			What&#8217;s Splat?</a>
-	</h2>
-	<div class="entry-content">
-		<p>The asterisk operator commonly known as splat can be a powerful ally in writing clean and highly functional code.  The splat operator has a variety of behavior depending on where it is used, and in this post I&rsquo;ll focus on the use of splat in conjunction with methods in Ruby 1.9 and later.</p>
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">What's Splat?</h2>
+	<div class="entry-content"><p>The asterisk operator commonly known as splat can be a powerful ally in writing clean and highly functional code.  The splat operator has a variety of behavior depending on where it is used, and in this post I&rsquo;ll focus on the use of splat in conjunction with methods in Ruby 1.9 and later.</p>
 
 <br/>
 
@@ -306,10 +297,7 @@
 
 
 
-
-		
-		
-	</div>
+</div>
 
 
 <div class="meta">
@@ -337,281 +325,22 @@
 </div>
 </article>
 
-
-    <article class="post">
-	<h2 class="title">
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
 		
-		<a href="/blog/2013/10/07/enumerables-best-kept-secrets/">
+		<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
 		
-			Enumerable&#8217;s Best Kept Secrets</a>
-	</h2>
-	<div class="entry-content">
-		<blockquote><p>An <code>Enumerator</code> is defined as a &ldquo;class which allows both internal and external iteration.&rdquo; It represent a series of objects, it can be lazily generated and it can be infinite. In contrast, the an <code>Enumerable</code> is a module and it &ldquo;provides collection classes with several traversal and searching methods, and with the ability to sort.&rdquo;</p></blockquote>
-
-<br/>
-
-
-<p>In Ruby, enumerators are used quite frequently for their extensive abstraction of iteration functionality. When we call the <code>Array#each</code> method, we can focus on dealing with the individual <code>Array</code> items rather than having to worry about how to retrieve each item one by one. When we need to find a subset of items from a <code>Hash</code>, we can use <code>#select</code> with a code block to decide which item we want in the result, without necessarily knowing how the <code>Hash</code> is traversed.</p>
-
-<br/>
-
-
-<p>All this power comes from the <code>Enumerable</code> module, and it is inlucded by many of the common Object types such as <code>Array</code>, <code>Hash</code>, <code>Range</code>, and <code>Set</code>. When first learning Ruby, <code>#each</code> and <code>#collect</code> quickly become an often-used tool we use for iterating over data. Most functionality can be accomplished by their use, however, there are many more advanced iterators available with very specific funtionality, but unless we constantly skim over the Ruby documentation, we may not know about them. I&rsquo;d like to introduce (or re-introduce for some of you) some of my favorites.</p>
-
-<br/>
-
-
-<h2>#count</h2>
-
-<p>Alright, alright. You may use <code>#count</code> on a daily basis, but did you know that you can specify a parameter to the method call? It will return the number of occurrances of that particular value.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">fruit</span> <span class="o">=</span> <span class="sx">%w(apple orange banana apple kiwi grapes apple)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">fruit</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;apple&quot;</span><span class="p">)</span> <span class="c1">#=&gt; 3</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you though that was cool, then hold on to your pants. When you add a block that evaluates a condition for each item in the collection, you can add logic regarding which items you want to count. If the block return <code>true</code> the item gets counted.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">fruit</span> <span class="o">=</span> <span class="sx">%w(apple orange banana apple kiwi grapes apple)</span>
-</span><span class='line'><span class="n">fruit</span><span class="o">.</span><span class="n">count</span> <span class="p">{</span> <span class="o">|</span><span class="n">item</span><span class="o">|</span> <span class="sx">%w(banana kiwi)</span><span class="o">.</span><span class="n">include?</span> <span class="n">item</span> <span class="p">}</span> <span class="c1">#=&gt; 2</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<br/>
-
-
-<h2>#lazy</h2>
-
-<p>We all like to be lazy sometimes. Starting in Ruby 2.0, we can now let <code>Enumerable</code> objects be lazy too. All this means is that the result of the enumerable function will not get evaluated until you tell it to.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">car_names</span> <span class="o">=</span> <span class="sx">%w(audi chevrolet dodge)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">capitalized_car_names</span> <span class="o">=</span> <span class="n">car_names</span><span class="o">.</span><span class="n">lazy</span><span class="o">.</span><span class="n">map</span> <span class="o">&amp;</span><span class="ss">:capitalize</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Enumerator::Lazy: #&lt;Enumerator::Lazy: [&quot;audi&quot;, &quot;chevrolet&quot;, &quot;dodge&quot;]&gt;:map&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">capitalized_car_names</span><span class="o">.</span><span class="n">to_a</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Audi&quot;</span><span class="p">,</span> <span class="s2">&quot;Chevrolet&quot;</span><span class="p">,</span> <span class="s2">&quot;Dodge&quot;</span><span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The behavior in this example doesn&rsquo;t really show the full potential of <code>#lazy</code>. Imagine that you have an operation that you want to apply to a collection, however, the contents of the given collection are dynamically changing. Using <code>#lazy</code> keeps the enumerator updated with the latest state of the collection.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">car_names</span> <span class="o">&lt;&lt;</span> <span class="s1">&#39;volkswagen&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">capitalized_car_names</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Enumerator::Lazy: #&lt;Enumerator::Lazy: [&quot;audi&quot;, &quot;chevrolet&quot;, &quot;dodge&quot;, &quot;volkswagen&quot;]&gt;:map&gt; </span>
-</span><span class='line'>
-</span><span class='line'><span class="n">capitalized_car_names</span><span class="o">.</span><span class="n">to_a</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Audi&quot;</span><span class="p">,</span> <span class="s2">&quot;Chevrolet&quot;</span><span class="p">,</span> <span class="s2">&quot;Dodge&quot;</span><span class="p">,</span> <span class="s2">&quot;Volkswagen&quot;</span><span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">car_names</span><span class="o">.</span><span class="n">shift</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;audi&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">capitalized_car_names</span><span class="o">.</span><span class="n">to_a</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Chevrolet&quot;</span><span class="p">,</span> <span class="s2">&quot;Dodge&quot;</span><span class="p">,</span> <span class="s2">&quot;Volkswagen&quot;</span><span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
+		
+		<a class="addthis_button_tweet"></a>
+		
 		
 		
 	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-10-07T18:41:00-04:00" pubdate data-updated="true">Oct 7<span>th</span>, 2013</time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ruby/'>Ruby</a>
-
-
-</div>
 	
 </div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2013/10/07/nag-a-ram/">
-		
-			Nag a Ram</a>
-	</h2>
-	<div class="entry-content">
-		<blockquote><p>An anagram is a type of word play, the result of rearranging the letters of a word or phrase to produce a new word or phrase, using all the original letters exactly once; for example orchestra can be rearranged into carthorse. Someone who creates anagrams may be called an &ldquo;anagrammatist&rdquo;. <em>Source: <a href="http://en.wikipedia.org/wiki/Anagram">Wikipedia</a></em></p></blockquote>
-
-<br/>
-
-
-<p>The core of a recent code challange included finding out whether one string is an anagram of another. Now this task can be accomplished with a couple of iterators and character comparison, but such an answer would yield code that is too complex looking for what I needs to accomplish and it may be difficult to read.</p>
-
-<p>Rather than picking each letter from the first string and finding it in the second, I wanted to compare the two strings in a single step. First, the strings both need to be sorted and in order to do this, they first had to be converted to an array of single letters. With a little <code>String#split</code> and <code>Array#sort</code> magic the resulting arrays can easily be compared.</p>
-
-<br/>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Anagram</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-</span><span class='line'>    <span class="vi">@word</span> <span class="o">=</span> <span class="n">word</span>
-</span><span class='line'>    <span class="vi">@word_match_string</span> <span class="o">=</span> <span class="n">generate_match_string</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">words</span><span class="o">.</span><span class="n">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">potential_anagram</span><span class="o">|</span>
-</span><span class='line'>      <span class="vi">@word_match_string</span> <span class="o">==</span> <span class="n">generate_match_string</span><span class="p">(</span><span class="n">potential_anagram</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kp">private</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">generate_match_string</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">word</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-10-07T12:05:00-04:00" pubdate data-updated="true">Oct 7<span>th</span>, 2013</time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ruby/'>Ruby</a>
 
 
 </div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2013/09/24/hello-world/">
-		
-			Hello World</a>
-	</h2>
-	<div class="entry-content">
-		<p>This is my first post!</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-09-24T16:56:00-04:00" pubdate data-updated="true">Sep 24<span>th</span>, 2013</time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ruby/'>Ruby</a>
-
-
-</div>
-	
-</div>
-</article>
-
-<nav id="pagenavi">
-    
-    
-    <div class="center"><a href="/blog/archives">Blog Archives</a></div>
-</nav></div>
 	<footer id="footer" class="inner">Copyright &copy; 2013
 
     Manuel Neuhauser

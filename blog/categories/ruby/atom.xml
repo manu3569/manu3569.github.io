@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Lucid Coding]]></title>
   <link href="http://manu3569.github.io/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-10-08T11:32:49-04:00</updated>
+  <updated>2013-10-08T23:44:21-04:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
@@ -12,6 +12,149 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[What's Splat?]]></title>
+    <link href="http://manu3569.github.io/blog/2013/10/08/whats-splat/"/>
+    <updated>2013-10-08T22:12:00-04:00</updated>
+    <id>http://manu3569.github.io/blog/2013/10/08/whats-splat</id>
+    <content type="html"><![CDATA[<p>The asterisk operator commonly known as splat can be a powerful ally in writing clean and highly functional code.  The splat operator has a variety of behavior depending on where it is used, and in this post I&rsquo;ll focus on the use of splat in conjunction with methods in Ruby 1.9 and later.</p>
+
+<br/>
+
+
+<h3>Arbitrary Argument Length in Method Signature</h3>
+
+<p>Occasionally, we would like to define a method that will accept an undefined number of argument.  Typically, we use an optional <code>Hash</code> as the last argument, which holds a variety of arguments.  However, we can also take advantage of the splat operator by placing it in front of an argument variable name in the method definition.  It will cause the argument variable to capture an <code>Array</code> of all arguments passed to the function that have not been matched to other arguments in the method signature.  The splat operator can be used at the beginning or at the end of the argument list, though for the latter, the last argument that is passed into the function must be a <code>Hash</code>.</p>
+
+<p>``` ruby
+def add_to(playlist, *songs)
+  songs.each do |song|</p>
+
+<pre><code>playlist &lt;&lt; song
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>rock = []
+add_to(rock, &ldquo;Beatles &ndash; Yellow Submarine&rdquo;, &ldquo;Counting Crows &ndash; Big Yellow Taxi&rdquo;, &ldquo;Coldplay &ndash; Yellow&rdquo;)</p>
+
+<p>rock.inspect
+ #=> &ldquo;["Beatles &ndash; Yellow Submarine&rdquo;, &ldquo;Counting Crows &ndash; Big Yellow Taxi&rdquo;, &ldquo;Coldplay &ndash; Yellow&rdquo;]&ldquo;
+```</p>
+
+<p>``` ruby
+def display_songs(*songs, formatting)
+  songs.each do |song|</p>
+
+<pre><code>puts "#{formatting[:start]} #{song} #{formatting[:end]}"
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>display_songs(&ldquo;Stairway to Heaven&rdquo;, &ldquo;Hotel California&rdquo;, &ldquo;Hold the Line&rdquo;, {:start => &ldquo;>>>&rdquo;, :end => &ldquo;&lt;&lt;&lt;&rdquo;})
+ # >>> Stairway to Heaven &lt;&lt;&lt;
+ # >>> Hotel California &lt;&lt;&lt;
+ # >>> Hold the Line &lt;&lt;&lt;
+```</p>
+
+<p>There is one more &mdash;for the lack of a better word&mdash; <em>interesting</em> use of the splat operator in the method signature at the end when it&rsquo;s by itself.  It allows for additional arguments to be accepted, but ignored by the method.</p>
+
+<p>``` ruby
+def my_favorite_food(first,second,*)
+  puts &ldquo;My favorite food items are #{first} and #{second}.&rdquo;
+end</p>
+
+<p>my_favorite_food(&ldquo;pizza&rdquo;,&ldquo;sushi&rdquo;,&ldquo;salad&rdquo;)
+ #=> My favorite food items are pizza and sushi.
+```</p>
+
+<br/>
+
+
+<br/>
+
+
+<h3>Calling Methods</h3>
+
+<p>The reason for this blog entry is actually this section.  I recently worked on a project in which I wanted to use <code>Object#send</code> to dynamically call an instance method. The method <code>#play</code> takes an argument, while <code>#list</code> doesn&rsquo;t. I quickly ran into a problem with this particular code:</p>
+
+<p>``` ruby
+def play(song)
+  # code to play given song
+end</p>
+
+<p>def list
+  # code to display all songs
+end</p>
+
+<p>def process(input)
+  command, args = input.split(&ldquo; &rdquo;, 2)
+  puts args.inspect
+  self.send(command, args)
+end</p>
+
+<p>process(&ldquo;play Michael Jackson &ndash; Beat It&rdquo;)
+ #=> nil</p>
+
+<p>process(&ldquo;list&rdquo;)
+ #ArgumentError: wrong number of arguments (1 for 0)
+ # from (irb):32:in <code>list'
+ # from (irb):38:in</code>process'
+<code>``
+When processing the input "list",</code>args<code>is set to</code>nil<code>, which is still considered an argument and it triggers an</code>ArgumentError<code>because</code>#list` does not take any arguments.</p>
+
+<p>Our little friend splat can actually help us resolve this issue.  When calling a method and prepending the splat to an array variable, it will cause it to be distributed across the arguments of the method.  In my case, the empty <code>args</code> variable was distributed across exactly no arguments.  By adding the splat, we can now dynamically send either one or two arguments to the <code>#send</code> function.</p>
+
+<p>```ruby
+def process(input)
+  command, args = input.split(&ldquo; &rdquo;, 2)
+  puts args.class
+  self.send(command, *args)
+end</p>
+
+<p>process(&ldquo;play Michael Jackson &ndash; Beat It&rdquo;)
+ #=> nil</p>
+
+<p>process(&ldquo;list&rdquo;)
+ #=> nil
+```</p>
+
+<p>When using splat to distribute the values to the arguments, the count must match exactly.  Also, only a splat in front of an empty <code>Array</code>, <code>Hash</code> or <code>nil</code> will yield no value to argument assignment.</p>
+
+<p>``` ruby</p>
+
+<p>def zero
+  puts &ldquo;Nothing&rdquo;
+end</p>
+
+<p>def one(a)
+  puts &ldquo;#{a}&rdquo;
+end</p>
+
+<p>def two(a,b)
+  puts &ldquo;#{a}, #{b}&rdquo;
+end</p>
+
+<p>def three(a,b,c)
+  puts &ldquo;#{a}, #{b}, #{c}&rdquo;
+end</p>
+
+<p>values = [1, 2]</p>
+
+<p>zero(<em>values)  # Error
+one(</em>values)   # Error
+two(<em>values)   # Success
+three(</em>values) # Error</p>
+
+<p>zero(<em>[])      # Success
+zero(</em>{})      # Success
+zero(*nil)     # Success
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Enumerable's Best Kept Secrets]]></title>
