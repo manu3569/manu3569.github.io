@@ -4,7 +4,7 @@
   <title><![CDATA[Lucid Coding]]></title>
   <link href="http://manu3569.github.io/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-10-10T10:56:26-04:00</updated>
+  <updated>2013-10-24T08:58:41-04:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
@@ -12,6 +12,304 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby's 7 Best Kept Secrets]]></title>
+    <link href="http://manu3569.github.io/blog/2013/10/23/rubys-7-best-kept-secrets/"/>
+    <updated>2013-10-23T22:50:00-04:00</updated>
+    <id>http://manu3569.github.io/blog/2013/10/23/rubys-7-best-kept-secrets</id>
+    <content type="html"><![CDATA[<h3>1. Syntactical Shortcuts for Iterations</h3>
+
+<p>When you need to apply a method to all items within an <code>Enumerable</code>, instead of creating a block syntax with a local variable, you can prepend an <code>&amp;</code> before the <code>Symbol</code> that represents the method name and pass it to the iteration method as an argument. This works for all functions that do not take an argument.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sx">%w(ann bob carl)</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="nb">name</span><span class="o">|</span> <span class="nb">name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">}</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Ann&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="sx">%w(ann bob carl)</span><span class="o">.</span><span class="n">map</span> <span class="o">&amp;</span><span class="ss">:capitalize</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Ann&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These shortcuts work because calling <code>Symbol#to_proc</code> returns a proc that responds to the symbol&rsquo;s method. So the <code>:capitalize</code> symbol is first converted to a proc, and then to a block.</p>
+
+<p>Similarly, you can pass the <code>Symbol</code> for a function into <code>#inject</code> and it will sequentially apply the method to items. This method needs to take one argument, which in this case will be <code>num</code> and it gets sent to the collector <code>sum</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">(</span><span class="mi">1</span><span class="o">.</span><span class="n">.</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">inject</span> <span class="p">{</span><span class="o">|</span><span class="n">sum</span><span class="p">,</span><span class="n">num</span><span class="o">|</span> <span class="n">sum</span> <span class="o">+=</span> <span class="n">num</span> <span class="p">}</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="mi">55</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="mi">1</span><span class="o">.</span><span class="n">.</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">inject</span> <span class="ss">:+</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="mi">55</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>2. Set Intersection for an Array</h3>
+
+<p>There&rsquo;s an easy way to get the intersection, or set of common elements, of two <code>Array</code>s. By applying the <code>&amp;</code> operator to one <code>Array</code> and passing the other as an argument.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="o">]</span> <span class="o">&amp;</span> <span class="o">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="o">]</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="sx">%w(Hi, my name is Alice)</span> <span class="o">&amp;</span> <span class="sx">%w(My name is Bob)</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;is&quot;</span><span class="o">]</span>   <span class="c1"># The comparison is case sensitive</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Dog</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">==</span><span class="p">(</span><span class="n">other_dog</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other_dog</span><span class="o">.</span><span class="n">name</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">shared_dog</span> <span class="o">=</span> <span class="no">Dog</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Fido&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span><span class="no">Dog</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Scooby&#39;</span><span class="p">),</span> <span class="no">Dog</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Snoopy&#39;</span><span class="p">),</span> <span class="n">shared_dog</span><span class="o">]</span> <span class="o">&amp;</span> <span class="o">[</span><span class="no">Dog</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Scooby&#39;</span><span class="p">),</span> <span class="n">shared_dog</span><span class="o">]</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="c1">#&lt;Dog:0x007fd96c0f4658 @name=&quot;Fido&quot;&gt;]</span>
+</span><span class='line'>  <span class="c1"># shared_dog is considered a match because the object IDs match. </span>
+</span><span class='line'>  <span class="c1"># The Dog#== method is not used</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>3. Ignoring Arguments and Return Values</h3>
+
+<p>In cases where argument variables need to be set in order to receive values, you can end up with verbose code becaues unused arguments are specified. By using the <code>_</code> (underscore) as an argument, it visually hides some of the received values. Also, when defining <code>_</code> multiple times it will not raise a <code>SyntaxError</code> unlike any other variable name.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">[[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="s2">&quot;female&quot;</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="s2">&quot;male&quot;</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;Trudy&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;alien&quot;</span><span class="o">]].</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="n">ignore</span><span class="p">,</span><span class="n">ignore</span><span class="p">,</span><span class="n">gender</span><span class="o">|</span> <span class="n">gender</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="ss">SyntaxError</span><span class="p">:</span> <span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">81</span><span class="p">:</span> <span class="n">duplicated</span> <span class="n">argument</span> <span class="nb">name</span>
+</span><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span> <span class="s2">&quot;alien&quot;</span><span class="o">]].</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="n">ignore</span><span class="p">,</span><span class="n">ignore</span><span class="p">,</span><span class="n">gender</span><span class="o">|</span> <span class="n">gender</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">[[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="s2">&quot;female&quot;</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="s2">&quot;male&quot;</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;Trudy&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;alien&quot;</span><span class="o">]].</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">gender</span><span class="o">|</span> <span class="n">gender</span> <span class="p">}</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;female&quot;</span><span class="p">,</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span> <span class="s2">&quot;alien&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">hometown</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span> <span class="s2">&quot;New York City&quot;</span><span class="o">]</span>
+</span><span class='line'><span class="nb">name</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;Alice&quot;</span>
+</span><span class='line'><span class="n">hometown</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;New York City&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>4. Autovivification</h3>
+
+<p><code>Hash.new</code> can take a block that is run when a non-existing key is accessed. The code snipped below ensures that a <code>Hash</code> with infinite sub-Hash nesting gets created when accessing an arbitrary depth of non-existing keys.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">endless</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">{</span><span class="o">|</span><span class="nb">hash</span><span class="p">,</span> <span class="n">key</span><span class="o">|</span> <span class="nb">hash</span><span class="o">[</span><span class="n">key</span><span class="o">]</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">&amp;</span><span class="nb">hash</span><span class="o">.</span><span class="n">default_proc</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">endless</span><span class="o">[</span><span class="ss">:one</span><span class="o">][</span><span class="ss">:two</span><span class="o">][</span><span class="ss">:three</span><span class="o">][</span><span class="ss">:or</span><span class="o">][</span><span class="ss">:more</span><span class="o">][</span><span class="ss">:levels</span><span class="o">][</span><span class="ss">:deep</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;This is insane!!!&quot;</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;This is insane!!!&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>5. Advanced Text Interpolation</h3>
+
+<p>When interpolating variable values into a string, the variables are commonly placed within the delimited text. The <code>%</code> allows us to replace the character string <code>%s</code> within the text with items from an array.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="s2">&quot;Hi, my name is %s, and I live in %s.&quot;</span> <span class="o">%</span> <span class="o">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span><span class="s2">&quot;New York&quot;</span><span class="o">]</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;Hi, my name is Alice, and I live in New York.&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">phone_template</span> <span class="o">=</span> <span class="s2">&quot;I&#39;m %s and my phone number is %s.&quot;</span>
+</span><span class='line'><span class="n">phone_template</span> <span class="o">%</span> <span class="o">[</span><span class="s2">&quot;Jenny&quot;</span><span class="p">,</span><span class="s2">&quot;867-5309&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>6. Lazy Loading</h3>
+
+<p>We all like to be lazy sometimes. Starting in Ruby 2.0, we can now let <code>Enumerable</code> objects be lazy too. All this means is that the result of the enumerable function will not get evaluated until you tell it to.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">car_names</span> <span class="o">=</span> <span class="sx">%w(audi chevrolet dodge)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span> <span class="o">=</span> <span class="n">car_names</span><span class="o">.</span><span class="n">lazy</span><span class="o">.</span><span class="n">map</span> <span class="o">&amp;</span><span class="ss">:capitalize</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Enumerator::Lazy: #&lt;Enumerator::Lazy: [&quot;audi&quot;, &quot;chevrolet&quot;, &quot;dodge&quot;]&gt;:map&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span><span class="o">.</span><span class="n">to_a</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Audi&quot;</span><span class="p">,</span> <span class="s2">&quot;Chevrolet&quot;</span><span class="p">,</span> <span class="s2">&quot;Dodge&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The behavior in this example doesn&rsquo;t really show the full potential of <code>#lazy</code>. Imagine that you have an operation that you want to apply to a collection, however, the contents of the given collection are dynamically changing. Using <code>#lazy</code> keeps the enumerator updated with the latest state of the collection.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">car_names</span> <span class="o">&lt;&lt;</span> <span class="s1">&#39;volkswagen&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Enumerator::Lazy: #&lt;Enumerator::Lazy: [&quot;audi&quot;, &quot;chevrolet&quot;, &quot;dodge&quot;, &quot;volkswagen&quot;]&gt;:map&gt; </span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span><span class="o">.</span><span class="n">to_a</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Audi&quot;</span><span class="p">,</span> <span class="s2">&quot;Chevrolet&quot;</span><span class="p">,</span> <span class="s2">&quot;Dodge&quot;</span><span class="p">,</span> <span class="s2">&quot;Volkswagen&quot;</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">car_names</span><span class="o">.</span><span class="n">shift</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;audi&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">capitalized_car_names</span><span class="o">.</span><span class="n">to_a</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Chevrolet&quot;</span><span class="p">,</span> <span class="s2">&quot;Dodge&quot;</span><span class="p">,</span> <span class="s2">&quot;Volkswagen&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>7. Counting A Subset</h3>
+
+<p>You may use <code>#count</code> on a daily basis, but did you know that you can specify a parameter to the method call? It will return the number of occurrances of that particular value.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">fruit</span> <span class="o">=</span> <span class="sx">%w(apple orange banana apple kiwi grapes apple)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">fruit</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;apple&quot;</span><span class="p">)</span> <span class="c1">#=&gt; 3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you though that was cool, then hold on to your pants. When you add a block that evaluates a condition for each item in the collection, you can add logic regarding which items you want to count. If the block return <code>true</code> the item gets counted.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">fruit</span> <span class="o">=</span> <span class="sx">%w(apple orange banana apple kiwi grapes apple)</span>
+</span><span class='line'><span class="n">fruit</span><span class="o">.</span><span class="n">count</span> <span class="p">{</span> <span class="o">|</span><span class="n">item</span><span class="o">|</span> <span class="sx">%w(banana kiwi)</span><span class="o">.</span><span class="n">include?</span> <span class="n">item</span> <span class="p">}</span> <span class="c1">#=&gt; 2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Cool Ruby Dev Tools]]></title>
+    <link href="http://manu3569.github.io/blog/2013/10/10/cool-ruby-dev-tools/"/>
+    <updated>2013-10-10T13:37:00-04:00</updated>
+    <id>http://manu3569.github.io/blog/2013/10/10/cool-ruby-dev-tools</id>
+    <content type="html"><![CDATA[<h3>guard-rspec Gem</h3>
+
+<p>Guardfile &ndash; generated by <code>guard init rspec</code></p>
+
+<h3>terminal-notifier-guard</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">guard</span> <span class="ss">:rspec</span><span class="p">,</span> <span class="ss">:cli</span> <span class="o">=&gt;</span> <span class="s2">&quot;--color --format nested --fail-fast --drb&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^spec/.+_spec\.rb$}</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^lib/(.+)\.rb$}</span><span class="p">)</span>     <span class="p">{</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span> <span class="s2">&quot;spec/</span><span class="si">#{</span><span class="n">m</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="si">}</span><span class="s2">_spec.rb&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[What the Splat?]]></title>
