@@ -4,7 +4,7 @@
   <title><![CDATA[Lucid Coding]]></title>
   <link href="http://manu3569.github.io/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-10-24T08:58:41-04:00</updated>
+  <updated>2013-10-24T09:08:35-04:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
@@ -27,11 +27,11 @@
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sx">%w(ann bob carl)</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="nb">name</span><span class="o">|</span> <span class="nb">name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">}</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Ann&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="o">]</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sx">%w(alice bob carl)</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="nb">name</span><span class="o">|</span> <span class="nb">name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">}</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="o">]</span>
 </span><span class='line'>
-</span><span class='line'><span class="sx">%w(ann bob carl)</span><span class="o">.</span><span class="n">map</span> <span class="o">&amp;</span><span class="ss">:capitalize</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Ann&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="o">]</span>
+</span><span class='line'><span class="sx">%w(alice bob carl)</span><span class="o">.</span><span class="n">map</span> <span class="o">&amp;</span><span class="ss">:capitalize</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carl&quot;</span><span class="o">]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
