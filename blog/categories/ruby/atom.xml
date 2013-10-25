@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Ruby | Lucid Coding]]></title>
+  <title><![CDATA[Category: Ruby | Manuel Neuhauser]]></title>
   <link href="http://manu3569.github.io/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-10-24T09:08:35-04:00</updated>
+  <updated>2013-10-25T11:36:45-04:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
