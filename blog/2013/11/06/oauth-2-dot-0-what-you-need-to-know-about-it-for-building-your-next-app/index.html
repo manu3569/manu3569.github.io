@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OAuth 2.0 - What you need to know about it for building your next app - Manuel Neuhauser</title>
+  <meta name="author" content="Manuel Neuhauser">
+
+  
+  <meta name="description" content="OAuth 2.0 is an authorization framework that allows applications to gain access to an HTTP service. It has become the de facto standard for users to &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://manu3569.github.io/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Manuel Neuhauser" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-44751707-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">mn</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">Manuel Neuhauser</a></h1>
+  
+    <h2>Ruby, PHP, JavaScript, SQL, HTML, CSS, Networking, Security</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:manu3569.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">OAuth 2.0 - What You Need to Know About It for Building Your Next App</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-06T22:42:00-05:00" pubdate data-updated="true">Nov 6<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>OAuth 2.0 is an authorization framework that allows applications to gain access to an HTTP service.  It has become the <em>de facto</em> standard for users to share data from one website account with another website.  You may have already used OAuth without even realizing it.  The popular login options &ldquo;Login with Facebook&rdquo; and &ldquo;Login with Twitter&rdquo; are both utilizing the OAuth authorization process defined in RFC6749 &mdash; namely OAuth 2.0.</p>
+
+<p>When building a web application, OAuth is making it easy for developers to tie in with other websites, though there are some terms that first need to be understood to comprehend exactly how access can be gained and granted.</p>
+
+<p>Authentication is the process in which one user identifies herself based on some shared secret like a username and password or a token.  Authorization, on the other hand, dictates the level of access an authenticated user has to any given resource.  A token or hash (not to be confused with the <code>Hash</code> data-type) is merely a generated, hard-to-guess string of characters.</p>
+
+<p>Token-based authorization such as OAuth has the advantage of eliminating the need for a user to share her password with a 3rd party app, allowing the user to restrict the level of access, and permitting the user to revoke access to her data.</p>
+
+<p>In order to ensure security without compromising the ease of use, OAuth 2.0 requires that all communication is sent over an SSL connection.</p>
+
+<p>Let&rsquo;s look at a concrete example of how we can use OAuth to gain access to a users GitHub account within our app.</p>
+
+<br/>
+
+
+<h3>1. Register the application</h3>
+
+<p>First and foremost, we need to establish a trust relationship between our application <em>MyApp</em> and Github.  This is done through means of using a shared client ID and client secret which is generated when <a href="https://github.com/settings/applications/new">registering our app with Github</a>.  When using these credentials in API requests, Github can properly identify the authenticity of our app.</p>
+
+<br/>
+
+
+<h3>2.Authorization request &amp; grant</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>+-------+                               +------------+
+</span><span class='line'>|       |--(1)- Authorization Request -&gt;|   GitHub   |
+</span><span class='line'>| MyApp |                               | (Resource  |
+</span><span class='line'>|       |&lt;-(2)-- Authorization Grant ---|   Owner)   |
+</span><span class='line'>+-------+                               +------------+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In order to initiate a request to gain access to certain data in the user&rsquo;s Github account, we craft a special link in our application <code>MyApp</code> which, when clicked, will forward the user to GitHub with an <em>authorization request</em>.  It looks like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>GET https://github.com/login/oauth/authorize/?client_id=71d3cfc29d&scope=user:email&redirect_uri=https://myapp.com/callback</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When looking closer at the link, we see three parameters:</p>
+
+<ul>
+<li><code>client_id</code> &ndash; This is the secret shared identifier that Github has previously provided to us when we registered our app.</li>
+<li><code>scope</code> &ndash; It describes what resources our app wants access to.  The available scopes are defined by Github.</li>
+<li><code>redirect_uri</code> &ndash; Tells Github where to send the <em>authorization grant</em> to.</li>
+</ul>
+
+
+<p>Github will use these parameters to validate the authenticity of the request and find out what resources is requested.  It presents a prompt to the logged in Github user asking whether<code>MyApp</code> should be allowed to access a certain set of resources in their account. When the user agrees to grant access, Github will send an HTTP <code>GET</code> request to the <code>redirect_uri</code> and appends a <code>code</code> parameter with contains the authorization grant.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>GET https://www.myapp.com/?code=4dabfce522efeecaac6819</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<h3>3. Access Token</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>+-------+                               +----------------+
+</span><span class='line'>|       |--(3)-- Authorization Grant --&gt;|     GitHub     |
+</span><span class='line'>| MyApp |                               | (Authorization |
+</span><span class='line'>|       |&lt;-(4)------ Access Token ------|     Server)    |
+</span><span class='line'>+-------+                               +----------------+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that <code>MyApp</code> has the authorization grant, it can contact Github and request an access token, which is used for the actual API calls. To do that <code>MyApp</code> sends a <code>POST</code> request to Github including the client ID, client secret and the authorization grant code.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>POST https://github.com/login/oauth/access_token
+</span><span class='line'> client_id=71d3cfc29d
+</span><span class='line'> client_secret=c826145889facbca
+</span><span class='line'> code=4dabfce522efeecaac6819</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If Github&rsquo;s authorization server receives valid credentials, it will respond with an access token.  This access token allows <code>MyApp</code> to send API requests on behalf of the user for resources belonging to the previously defined <code>scope</code>.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{ access_token: c826145889facbcae488411a45339a19 }</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<h3>4. Making API calls</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>+-------+                               +-----------+
+</span><span class='line'>|       |--(5)----- Access Token ------&gt;|   Github  |
+</span><span class='line'>| MyApp |                               | (Resource |
+</span><span class='line'>|       |&lt;-(6)--- Protected Resource ---|   Server) |
+</span><span class='line'>+-------+                               +-----------+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point, <code>MyApp</code> can make API calls to retrieve information from the Github user account, and it is authorized with the access token.  The access token can be put into either the header:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Authorization: token c826145889facbcae488411a45339a19</span></code></pre></td></tr></table></div></figure>
+
+
+<p>… or alternatively, added as a parameter to the API call URI:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>https://api.github.com/user?access_token=c826145889facbcae488411a45339a19</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<h3>Additional information</h3>
+
+<p>For a detailed breakdown of OAuth 2.0, I can highly recommend to read <a href="http://tools.ietf.org/html/rfc6749">RFC6749</a>, especially section <a href="http://tools.ietf.org/html/rfc6749#section-4">4</a> and <a href="http://tools.ietf.org/html/rfc6749#section-5">5</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Manuel Neuhauser</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-06T22:42:00-05:00" pubdate data-updated="true">Nov 6<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/api/'>API,</a>, <a class='category' href='/blog/categories/github/'>Github</a>, <a class='category' href='/blog/categories/oauth/'>OAuth,</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://manu3569.github.io/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app/" data-via="neuhausermanuel" data-counturl="http://manu3569.github.io/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/10/23/rubys-7-best-kept-secrets/" title="Previous Post: Ruby's 7 Best Kept Secrets">&laquo; Ruby's 7 Best Kept Secrets</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app/">OAuth 2.0 - What You Need to Know About It for Building Your Next App</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/23/rubys-7-best-kept-secrets/">Ruby's 7 Best Kept Secrets</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/08/what-the-splat/">What the Splat?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/07/enumerables-best-kept-secrets/">Enumerable's Best Kept Secrets</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/07/nag-a-ram/">Nag a Ram</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/manu3569">@manu3569</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'manu3569',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Manuel Neuhauser -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'manu3569';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://manu3569.github.io/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app/';
+        var disqus_url = 'http://manu3569.github.io/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

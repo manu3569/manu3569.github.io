@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: OAuth, | Manuel Neuhauser]]></title>
+  <link href="http://manu3569.github.io/blog/categories/oauth/atom.xml" rel="self"/>
+  <link href="http://manu3569.github.io/"/>
+  <updated>2013-11-07T09:19:35-05:00</updated>
+  <id>http://manu3569.github.io/</id>
+  <author>
+    <name><![CDATA[Manuel Neuhauser]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[OAuth 2.0 - What you need to know about it for building your next app]]></title>
+    <link href="http://manu3569.github.io/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app/"/>
+    <updated>2013-11-06T22:42:00-05:00</updated>
+    <id>http://manu3569.github.io/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app</id>
+    <content type="html"><![CDATA[<p>OAuth 2.0 is an authorization framework that allows applications to gain access to an HTTP service.  It has become the <em>de facto</em> standard for users to share data from one website account with another website.  You may have already used OAuth without even realizing it.  The popular login options &ldquo;Login with Facebook&rdquo; and &ldquo;Login with Twitter&rdquo; are both utilizing the OAuth authorization process defined in RFC6749 &mdash; namely OAuth 2.0.</p>
+
+<p>When building a web application, OAuth is making it easy for developers to tie in with other websites, though there are some terms that first need to be understood to comprehend exactly how access can be gained and granted.</p>
+
+<p>Authentication is the process in which one user identifies herself based on some shared secret like a username and password or a token.  Authorization, on the other hand, dictates the level of access an authenticated user has to any given resource.  A token or hash (not to be confused with the <code>Hash</code> data-type) is merely a generated, hard-to-guess string of characters.</p>
+
+<p>Token-based authorization such as OAuth has the advantage of eliminating the need for a user to share her password with a 3rd party app, allowing the user to restrict the level of access, and permitting the user to revoke access to her data.</p>
+
+<p>In order to ensure security without compromising the ease of use, OAuth 2.0 requires that all communication is sent over an SSL connection.</p>
+
+<p>Let&rsquo;s look at a concrete example of how we can use OAuth to gain access to a users GitHub account within our app.</p>
+
+<br/>
+
+
+<h3>1. Register the application</h3>
+
+<p>First and foremost, we need to establish a trust relationship between our application <em>MyApp</em> and Github.  This is done through means of using a shared client ID and client secret which is generated when <a href="https://github.com/settings/applications/new">registering our app with Github</a>.  When using these credentials in API requests, Github can properly identify the authenticity of our app.</p>
+
+<br/>
+
+
+<h3>2.Authorization request &amp; grant</h3>
+
+<p><code>
++-------+                               +------------+
+|       |--(1)- Authorization Request -&gt;|   GitHub   |
+| MyApp |                               | (Resource  |
+|       |&lt;-(2)-- Authorization Grant ---|   Owner)   |
++-------+                               +------------+
+</code></p>
+
+<p>In order to initiate a request to gain access to certain data in the user&rsquo;s Github account, we craft a special link in our application <code>MyApp</code> which, when clicked, will forward the user to GitHub with an <em>authorization request</em>.  It looks like this:</p>
+
+<p><code>
+GET https://github.com/login/oauth/authorize/?client_id=71d3cfc29d&amp;scope=user:email&amp;redirect_uri=https://myapp.com/callback
+</code></p>
+
+<p>When looking closer at the link, we see three parameters:</p>
+
+<ul>
+<li><code>client_id</code> &ndash; This is the secret shared identifier that Github has previously provided to us when we registered our app.</li>
+<li><code>scope</code> &ndash; It describes what resources our app wants access to.  The available scopes are defined by Github.</li>
+<li><code>redirect_uri</code> &ndash; Tells Github where to send the <em>authorization grant</em> to.</li>
+</ul>
+
+
+<p>Github will use these parameters to validate the authenticity of the request and find out what resources is requested.  It presents a prompt to the logged in Github user asking whether<code>MyApp</code> should be allowed to access a certain set of resources in their account. When the user agrees to grant access, Github will send an HTTP <code>GET</code> request to the <code>redirect_uri</code> and appends a <code>code</code> parameter with contains the authorization grant.</p>
+
+<p><code>
+GET https://www.myapp.com/?code=4dabfce522efeecaac6819
+</code></p>
+
+<br/>
+
+
+<h3>3. Access Token</h3>
+
+<p><code>
++-------+                               +----------------+
+|       |--(3)-- Authorization Grant --&gt;|     GitHub     |
+| MyApp |                               | (Authorization |
+|       |&lt;-(4)------ Access Token ------|     Server)    |
++-------+                               +----------------+
+</code></p>
+
+<p>Now that <code>MyApp</code> has the authorization grant, it can contact Github and request an access token, which is used for the actual API calls. To do that <code>MyApp</code> sends a <code>POST</code> request to Github including the client ID, client secret and the authorization grant code.</p>
+
+<p><code>
+POST https://github.com/login/oauth/access_token
+ client_id=71d3cfc29d
+ client_secret=c826145889facbca
+ code=4dabfce522efeecaac6819
+</code></p>
+
+<p>If Github&rsquo;s authorization server receives valid credentials, it will respond with an access token.  This access token allows <code>MyApp</code> to send API requests on behalf of the user for resources belonging to the previously defined <code>scope</code>.</p>
+
+<p><code>
+{ access_token: c826145889facbcae488411a45339a19 }
+</code></p>
+
+<br/>
+
+
+<h3>4. Making API calls</h3>
+
+<p><code>
++-------+                               +-----------+
+|       |--(5)----- Access Token ------&gt;|   Github  |
+| MyApp |                               | (Resource |
+|       |&lt;-(6)--- Protected Resource ---|   Server) |
++-------+                               +-----------+
+</code></p>
+
+<p>At this point, <code>MyApp</code> can make API calls to retrieve information from the Github user account, and it is authorized with the access token.  The access token can be put into either the header:</p>
+
+<p><code>
+Authorization: token c826145889facbcae488411a45339a19
+</code></p>
+
+<p>… or alternatively, added as a parameter to the API call URI:</p>
+
+<p><code>
+https://api.github.com/user?access_token=c826145889facbcae488411a45339a19
+</code></p>
+
+<br/>
+
+
+<h3>Additional information</h3>
+
+<p>For a detailed breakdown of OAuth 2.0, I can highly recommend to read <a href="http://tools.ietf.org/html/rfc6749">RFC6749</a>, especially section <a href="http://tools.ietf.org/html/rfc6749#section-4">4</a> and <a href="http://tools.ietf.org/html/rfc6749#section-5">5</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>
