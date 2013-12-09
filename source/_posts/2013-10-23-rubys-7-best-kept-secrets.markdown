@@ -3,7 +3,7 @@ layout: post
 title: "Ruby's 7 Best Kept Secrets"
 date: 2013-10-23 22:50
 comments: true
-categories: 
+categories: Ruby
 ---
 
 
