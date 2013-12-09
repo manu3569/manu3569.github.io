@@ -140,7 +140,7 @@ On the bright side, Egor Homakov (@homakov) posted a challenge on Twitter for fi
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Looks like my 40 minute train ride has turned into a hacking session and I eagerly played around with the provided code to access the contents of my local <code>etc/passwd</code> file. Eureka! Finally, I figured out that by breaking up <code>..</code> (parent directory) with the wildcard <code>*</code>, I could trick the validation code into allowing my path string. Also, in <code>bash</code> the folder <code>.*.</code> behaves the same as <code>..</code>, so by prepending <code>etc/passwd</code> with the right number of <code>.*./</code> strings, I could finally access the coveted password file.</p>
+<p>Looks like my 40 minute train ride has turned into a hacking session and I eagerly played around with the provided code to access the contents of my local <code>etc/passwd</code> file. Eureka! Finally, I figured out that by breaking up <code>..</code> (parent directory) with the wildcard symbol <code>*</code>, I could trick the validation code into allowing my path string. Also, in <code>bash</code> the folder <code>.*.</code> behaves the same as <code>..</code>, so by prepending <code>etc/passwd</code> with the right number of <code>.*./</code> strings, I could finally access the coveted password file.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>

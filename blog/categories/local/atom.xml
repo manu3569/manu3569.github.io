@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Local | Manuel Neuhauser]]></title>
   <link href="http://manu3569.github.io/blog/categories/local/atom.xml" rel="self"/>
   <link href="http://manu3569.github.io/"/>
-  <updated>2013-12-09T09:12:39-05:00</updated>
+  <updated>2013-12-09T09:14:02-05:00</updated>
   <id>http://manu3569.github.io/</id>
   <author>
     <name><![CDATA[Manuel Neuhauser]]></name>
@@ -34,7 +34,7 @@ puts <code>cat #{input}</code>
 end
 ```</p>
 
-<p>Looks like my 40 minute train ride has turned into a hacking session and I eagerly played around with the provided code to access the contents of my local <code>etc/passwd</code> file. Eureka! Finally, I figured out that by breaking up <code>..</code> (parent directory) with the wildcard <code>*</code>, I could trick the validation code into allowing my path string. Also, in <code>bash</code> the folder <code>.*.</code> behaves the same as <code>..</code>, so by prepending <code>etc/passwd</code> with the right number of <code>.*./</code> strings, I could finally access the coveted password file.</p>
+<p>Looks like my 40 minute train ride has turned into a hacking session and I eagerly played around with the provided code to access the contents of my local <code>etc/passwd</code> file. Eureka! Finally, I figured out that by breaking up <code>..</code> (parent directory) with the wildcard symbol <code>*</code>, I could trick the validation code into allowing my path string. Also, in <code>bash</code> the folder <code>.*.</code> behaves the same as <code>..</code>, so by prepending <code>etc/passwd</code> with the right number of <code>.*./</code> strings, I could finally access the coveted password file.</p>
 
 <p>``` ruby</p>
 
