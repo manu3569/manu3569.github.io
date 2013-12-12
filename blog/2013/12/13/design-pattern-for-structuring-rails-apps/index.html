@@ -1,0 +1,574 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Design Pattern for Structuring Rails Apps - Manuel Neuhauser</title>
+  <meta name="author" content="Manuel Neuhauser">
+
+  
+  <meta name="description" content="I recently worked on the web application Wishgram and its develpment quickly got more complex when the need for an API arose to support an iOS app. I &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://manu3569.github.io/blog/2013/12/13/design-pattern-for-structuring-rails-apps/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/custom.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Manuel Neuhauser" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-44751707-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">mn</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">Manuel Neuhauser</a></h1>
+  
+    <h2>Ruby, PHP, JavaScript, SQL, HTML, CSS, Networking, Security</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:manu3569.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Design Pattern for Structuring Rails Apps</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-13T03:03:00-05:00" pubdate data-updated="true">Dec 13<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I recently worked on the web application <a href="http://wishgr.am">Wishgram</a> and its develpment quickly got more complex when the need for an API arose to support an iOS app.</p>
+
+<p>I&rsquo;m not a proponent for building controllers that handle both web browser requests and API calls, because it yields a less skinny controller with more complex code when web application and API specific code are mixed.</p>
+
+<p>For example, responses to success and failure actions in web application requests are generally handled with <code>render</code> or <code>redirect_to</code>, while API requests encapsulate the action outcome in a <code>JSON</code> or <code>XML</code> response. In a RESTful controller with 6 actions, we are quickly losing the beach body of a skinny controller.</p>
+
+<p>Usually, the login mechanisms for web application and API users differ, where the former typically uses a username or email with a password and the latter tends to use a certificate or an OAuth implementation for granting authentication. This was the case in my project, and handling two authentication methods in the controller added unnecessary complexity.</p>
+
+<p>Furthermore, the flat stucture of controllers &mdash; as produced by the Rails generators &mdash; became too cumbersome to organize with two or more separate areas of application functionality.</p>
+
+<p>My solution and proposed Rails design pattern is to always group common controllers into modules and to have them inherit from a dedicated group parent controller. Thus, group specific code such as callbacks that would generally reside in the <code>ApplicationController</code> can now be applied in isolation to a group in its dedicated parent controller. Even if, at the time of developing a Rails app, there are only plans for a basic web application this pattern should still be used to account for future growth.</p>
+
+<br/>
+
+
+<br/>
+
+
+<h2>Implementation of Controller Groups</h2>
+
+<p>In my example, we are creating a <code>Customers</code> controller for the customer-facing web application, the company-internal back end system and the API.</p>
+
+<br/>
+
+
+<br/>
+
+
+<h3>Generate Controllers</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rails generate controller FrontEnd
+</span><span class='line'><span class="nv">$ </span>rails generate controller FrontEnd/Customers
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ </span>rails generate controller BackEnd
+</span><span class='line'><span class="nv">$ </span>rails generate controller BackEnd/Customers
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ </span>rails generate controller API
+</span><span class='line'><span class="nv">$ </span>rails generate controller API/V1/Customers
+</span><span class='line'><span class="nv">$ </span>rails generate controller API/V2/Customers
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>Update Controllers</h3>
+
+<p>After generating the controllers in the groups, we change the superclass from <code>ApplicationController</code> to <code>&lt;Group&gt;Controller</code>.</p>
+
+<br/>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># app/controllers/front_end/customers_controller.rb</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">FrontEnd</span><span class="o">::</span><span class="no">CustomersController</span> <span class="o">&lt;</span> <span class="no">FrontEndController</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">index</span>
+</span><span class='line'>    <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s2">&quot;Welcome to our Website&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># app/controllers/back_end/customers_controller.rb</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">BackEnd</span><span class="o">::</span><span class="no">CustomersController</span> <span class="o">&lt;</span> <span class="no">BackEndController</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">index</span>
+</span><span class='line'>    <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s2">&quot;Admin Panel&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># app/controllers/api/v1/customers_controller.rb</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Api</span><span class="o">::</span><span class="ss">V1</span><span class="p">:</span><span class="ss">:CustomersController</span> <span class="o">&lt;</span> <span class="no">ApiController</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">index</span>
+</span><span class='line'>    <span class="n">render</span> <span class="ss">json</span><span class="p">:</span> <span class="p">{</span> <span class="ss">customers</span><span class="p">:</span> <span class="o">[]</span> <span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># app/controllers/api/v2/customers_controller.rb</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Api</span><span class="o">::</span><span class="ss">V2</span><span class="p">:</span><span class="ss">:CustomersController</span> <span class="o">&lt;</span> <span class="no">ApiController</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">index</span>
+</span><span class='line'>    <span class="n">render</span> <span class="ss">json</span><span class="p">:</span> <span class="p">{</span> <span class="ss">customers</span><span class="p">:</span> <span class="o">[]</span><span class="p">,</span> <span class="n">total_count</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">request_time</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span> <span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<br/>
+
+
+<p>Since all API controllers inherit from <code>ApiController</code>, we can easily disable CSRF for API calls to make non-GET valid requests without affecting the behavior in the front and back end controllers. This is a great example to demonstrate the advantage of separate controller groups.</p>
+
+<br/>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># app/controllers/api_controller.api</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">ApiController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class='line'>  <span class="n">protect_from_forgery</span> <span class="ss">with</span><span class="p">:</span> <span class="ss">:null_session</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>Building Routes</h3>
+
+<p>Now that we have the controllers separated, we want to separate the 3 different controller groups in individual subdomains thus reflecting a logical separation in the domain name. One bonus with this approach is that cookies won&rsquo;t be shared between our front and back end.</p>
+
+<p>The <code>constraints</code> option is used to tie controller groups to subdomains, and the <code>scope</code> specifies the <code>Module</code> that denotes a controller group without exposing it in the route path.</p>
+
+<br/>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#config/routes.rb</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;api_constraints&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="ss">MyApp</span><span class="p">:</span><span class="ss">:Application</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">draw</span> <span class="k">do</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">constraints</span> <span class="ss">subdomain</span><span class="p">:</span> <span class="s2">&quot;www&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">scope</span> <span class="ss">module</span><span class="p">:</span> <span class="ss">:front_end</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">resources</span> <span class="ss">:customers</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">constraints</span> <span class="ss">subdomain</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">scope</span> <span class="ss">module</span><span class="p">:</span> <span class="ss">:back_end</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">resources</span> <span class="ss">:customers</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">constraints</span> <span class="ss">subdomain</span><span class="p">:</span> <span class="s2">&quot;api&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">scope</span> <span class="ss">module</span><span class="p">:</span> <span class="ss">:api</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">scope</span> <span class="ss">module</span><span class="p">:</span> <span class="ss">:v1</span><span class="p">,</span> <span class="ss">constraints</span><span class="p">:</span> <span class="no">ApiConstraints</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">version</span><span class="p">:</span> <span class="mi">1</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="ss">:customers</span><span class="p">,</span> <span class="ss">controller</span><span class="p">:</span> <span class="s2">&quot;customers&quot;</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="n">scope</span> <span class="ss">module</span><span class="p">:</span> <span class="ss">:v2</span><span class="p">,</span> <span class="ss">constraints</span><span class="p">:</span> <span class="no">ApiConstraints</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">version</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="ss">:true</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="ss">:customers</span><span class="p">,</span> <span class="ss">controller</span><span class="p">:</span> <span class="s2">&quot;customers&quot;</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h3>API Versioning</h3>
+
+<p>At this point, we also want to future-proof the API and allow for supplemental versions. <a href="http://railscasts.com/episodes/350-rest-api-versioning">Ryan Bates&#8217; REST API Versioning Rail Cast #350</a> provides a perfect solution. We will integrate it by creating a customized contraint for the API version route <code>scope</code>.</p>
+
+<br/>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#lib/api_constraints</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">ApiConstraints</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@version</span> <span class="o">=</span> <span class="n">options</span><span class="o">[</span><span class="ss">:version</span><span class="o">]</span>
+</span><span class='line'>    <span class="vi">@default</span> <span class="o">=</span> <span class="n">options</span><span class="o">[</span><span class="ss">:default</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">matches?</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@default</span> <span class="o">||</span> <span class="n">req</span><span class="o">.</span><span class="n">headers</span><span class="o">[</span><span class="s1">&#39;Accept&#39;</span><span class="o">].</span><span class="n">include?</span><span class="p">(</span><span class="s2">&quot;application/vnd.myapp.v</span><span class="si">#{</span><span class="vi">@version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<h2>Final Words</h2>
+
+<p>At this time, there is no functionality in the Rails generator to set the inheritence for a controller. I&rsquo;m currently looking into building a gem to add such a feature to facilitate the use of the proposed Rails design pattern.</p>
+
+<p><a href="https://github.com/manu3569/mega-rails">The example application code used in this blog post is on Github</a>, so feel free to fork it, and please share your thoughts on the proposed Rails pattern.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Manuel Neuhauser</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-13T03:03:00-05:00" pubdate data-updated="true">Dec 13<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/api/'>API</a>, <a class='category' href='/blog/categories/design-pattern/'>Design Pattern</a>, <a class='category' href='/blog/categories/inheritance/'>Inheritance</a>, <a class='category' href='/blog/categories/rails/'>Rails</a>, <a class='category' href='/blog/categories/routes/'>Routes</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://manu3569.github.io/blog/2013/12/13/design-pattern-for-structuring-rails-apps/" data-via="manu_neuhauser" data-counturl="http://manu3569.github.io/blog/2013/12/13/design-pattern-for-structuring-rails-apps/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/12/09/challenge-accepted-local-file-inclusion/" title="Previous Post: Challenge Accepted: Local File Inclusion">&laquo; Challenge Accepted: Local File Inclusion</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+
+<img src="https://1.gravatar.com/avatar/04a3e0e237a8df305a8bc263d9017e67?r=x&s=440" alt="Manuel Neuhauser" class="profile-image">
+
+  <h1>Follow Me</h1>
+
+  <ul>
+    <li>Twitter: <a href="https://twitter.com/manu_neuhauser">@manu_neuhauser</a></li>
+    <li>Github: <a href="https://github.com/manu3569">@manu3569</a></li>
+  </ul>
+
+</section><section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/12/13/design-pattern-for-structuring-rails-apps/">Design Pattern for Structuring Rails Apps</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/12/09/challenge-accepted-local-file-inclusion/">Challenge Accepted: Local File Inclusion</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/06/oauth-2-dot-0-what-you-need-to-know-about-it-for-building-your-next-app/">OAuth 2.0 - What You Need to Know About It for Building Your Next App</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/23/rubys-7-best-kept-secrets/">Ruby's 7 Best Kept Secrets</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/08/what-the-splat/">What the Splat?</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Blog Roll</h1>
+
+  <ul>
+    <li><a href="http://loganhasson.github.io/">Logan Hasson</a></li>
+    <li><a href="http://37signals.com/svn/writers/dhh">DHH</a></li>
+  </ul>
+
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Manuel Neuhauser -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'manu3569';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://manu3569.github.io/blog/2013/12/13/design-pattern-for-structuring-rails-apps/';
+        var disqus_url = 'http://manu3569.github.io/blog/2013/12/13/design-pattern-for-structuring-rails-apps/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
