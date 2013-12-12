@@ -3,7 +3,7 @@ layout: post
 title: "OAuth 2.0 - What you need to know about it for building your next app"
 date: 2013-11-06 22:42
 comments: true
-categories: OAuth, API, Github
+categories: [OAuth, API, Github]
 ---
 
 OAuth 2.0 is an authorization framework that allows applications to gain access to an HTTP service.  It has become the *de facto* standard for users to share data from one website account with another website.  You may have already used OAuth without even realizing it.  The popular login options "Login with Facebook" and "Login with Twitter" are both utilizing the OAuth authorization process defined in RFC6749 &mdash; namely OAuth 2.0.

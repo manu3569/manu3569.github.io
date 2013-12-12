@@ -1,0 +1,8 @@
+.profile-image {
+  width: 75%;
+  margin: auto !important;
+  display: block !important;
+  -moz-border-radius: 220px !important;
+  -webkit-border-radius: 220px !important;
+  border-radius: 220px !important;
+}
