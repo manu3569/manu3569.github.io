@@ -9,7 +9,7 @@
   <meta name="author" content="Manuel Neuhauser">
 
   
-  <meta name="description" content="I recently worked on the web application Wishgram and its develpment quickly got more complex when the need for an API arose to support an iOS app. I &hellip;">
+  <meta name="description" content="I recently worked on the web application Wishgram and its development quickly got more complex when the need for an API arose to support an iOS app. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -115,7 +115,7 @@
   </header>
 
 
-<div class="entry-content"><p>I recently worked on the web application <a href="http://wishgr.am">Wishgram</a> and its develpment quickly got more complex when the need for an API arose to support an iOS app.</p>
+<div class="entry-content"><p>I recently worked on the web application <a href="http://wishgr.am">Wishgram</a> and its development quickly got more complex when the need for an API arose to support an iOS app.</p>
 
 <p>I&rsquo;m not a proponent for building controllers that handle both web browser requests and API calls, because it yields a less skinny controller with more complex code when web application and API specific code are mixed.</p>
 
@@ -123,7 +123,7 @@
 
 <p>Usually, the login mechanisms for web application and API users differ, where the former typically uses a username or email with a password and the latter tends to use a certificate or an OAuth implementation for granting authentication. This was the case in my project, and handling two authentication methods in the controller added unnecessary complexity.</p>
 
-<p>Furthermore, the flat stucture of controllers &mdash; as produced by the Rails generators &mdash; became too cumbersome to organize with two or more separate areas of application functionality.</p>
+<p>Furthermore, the flat structure of controllers &mdash; as produced by the Rails generators &mdash; became too cumbersome to organize with two or more separate areas of application functionality.</p>
 
 <p>My solution and proposed Rails design pattern is to always group common controllers into modules and to have them inherit from a dedicated group parent controller. Thus, group specific code such as callbacks that would generally reside in the <code>ApplicationController</code> can now be applied in isolation to a group in its dedicated parent controller. Even if, at the time of developing a Rails app, there are only plans for a basic web application this pattern should still be used to account for future growth.</p>
 
@@ -355,7 +355,7 @@
 
 <h3>API Versioning</h3>
 
-<p>At this point, we also want to future-proof the API and allow for supplemental versions. <a href="http://railscasts.com/episodes/350-rest-api-versioning">Ryan Bates&#8217; REST API Versioning Rail Cast #350</a> provides a perfect solution. We will integrate it by creating a customized contraint for the API version route <code>scope</code>.</p>
+<p>At this point, we also want to future-proof the API and allow for supplemental versions. <a href="http://railscasts.com/episodes/350-rest-api-versioning">Ryan Bates&#8217; REST API Versioning Rail Cast #350</a> provides a perfect solution. We will integrate it by creating a customized constraint for the API version route <code>scope</code>.</p>
 
 <br/>
 
@@ -395,7 +395,7 @@
 
 <h2>Final Words</h2>
 
-<p>At this time, there is no functionality in the Rails generator to set the inheritence for a controller. I&rsquo;m currently looking into building a gem to add such a feature to facilitate the use of the proposed Rails design pattern.</p>
+<p>At this time, there is no functionality in the Rails generator to set the inheritance for a controller. I&rsquo;m currently looking into building a gem to add such a feature to facilitate the use of the proposed Rails design pattern.</p>
 
 <p><a href="https://github.com/manu3569/mega-rails">The example application code used in this blog post is on Github</a>, so feel free to fork it, and please share your thoughts on the proposed Rails pattern.</p>
 </div>
